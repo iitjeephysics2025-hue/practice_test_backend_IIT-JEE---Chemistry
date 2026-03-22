@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -206,6 +207,16 @@ select option:nth-child(odd){background-color:#fff;}
 
 
 
+
+
+
+
+
+
+
+
+
+
 .register-btn{
   display:inline-block;
   padding:10px 16px;
@@ -227,6 +238,12 @@ select option:nth-child(odd){background-color:#fff;}
 
 
 
+
+
+
+
+
+
 </style>
 </head>
 
@@ -245,8 +262,6 @@ select option:nth-child(odd){background-color:#fff;}
       <li>Use the latest browser for the best experience.</li>
     </ul>
   </div>
-  
-  
   <input type="email" id="emailInput" placeholder="Enter your email" required />
   
   
@@ -255,7 +270,16 @@ select option:nth-child(odd){background-color:#fff;}
   
   
   
+  
+  
+  
+  
   <p id="loginError" style="color:red; font-size:13px; margin-top:5px;"></p>
+  
+  
+  
+  
+  
   
   
   
@@ -299,51 +323,78 @@ select option:nth-child(odd){background-color:#fff;}
 const BACKEND_URL="https://practice-test-backend-iit-jee-chemistry-hp48.onrender.com";
 
 
+
+
+
+
+
+
+
+
 /* === LOGIN LOGIC === */
 async function login(){
  const email=document.getElementById("emailInput").value.trim().toLowerCase();
+ const errorBox = document.getElementById("loginError");
+
+ // ❗ Step 1: Format validation
  if(!email || !email.includes("@")){
- document.getElementById("loginError").innerHTML = `
-  Your E-Mail ID is not registered.<br><br>
-  <a href="https://gten-educational-platform.github.io/Class-12/email.html" target="_blank" class="register-btn">
-    Register Now
-  </a>
-`;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  errorBox.innerHTML = `
+    Your E-Mail ID is not registered.<br><br>
+    <a href="https://gten-educational-platform.github.io/Class-12/email.html" target="_blank" class="register-btn">
+      Register Now
+    </a>
+  `;
   return;
-} else {
-  document.getElementById("loginError").innerHTML = "";
+ } else {
+  errorBox.innerHTML = "";
+ }
+
+ try {
+   const res=await fetch(`${BACKEND_URL}/login`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({email})
+   });
+
+   const data=await res.json();
+
+   // ❗ Step 2: Backend validation
+   if(data.token){
+    localStorage.setItem("studentEmail",email);
+    localStorage.setItem("sessionToken",data.token);
+    document.getElementById("loginContainer").style.display="none";
+    document.getElementById("appContainer").style.display="block";
+   } else {
+    errorBox.innerHTML = `
+      Your E-Mail ID is not registered.<br><br>
+      <a href="https://gten-educational-platform.github.io/Class-12/email.html"
+   target="_blank"
+   class="register-btn"
+   onclick="this.style.display='none'">
+  Register Now
+</a>
+    `;
+   }
+
+ } catch (err) {
+   errorBox.innerText = "Server error. Try later.";
+ }
 }
- const res=await fetch(`${BACKEND_URL}/login`,{
-  method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})
- });
- const data=await res.json();
- if(data.token){
-  localStorage.setItem("studentEmail",email);
-  localStorage.setItem("sessionToken",data.token);
-  document.getElementById("loginContainer").style.display="none";
-  document.getElementById("appContainer").style.display="block";
- } else alert("Login failed. Try again.");
-}
+
+document.getElementById("emailInput").addEventListener("input", function() {
+  const errorBox = document.getElementById("loginError");
+  errorBox.innerHTML = ""; // 🔥 clears error + hides Register button
+});
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -384,8 +435,15 @@ setInterval(async()=>{
  }
 },5000);
 
-/* === MAIN LOGIC === */
-   const catalog = {
+
+
+
+
+
+
+
+
+  const catalog = {
   "Topic wise mcq (basic)": {
                "Chapter 1 - CHEMICAL ARITHMETIC": {
               "1. SCIENTIFIC NOTATION": "https://chemistry-g10ep.github.io/IIT-JEE-EASY-QUESTION-HTML/1. SCIENTIFIC NOTATION.html",
@@ -1038,6 +1096,12 @@ setInterval(async()=>{
     }
   }
 };
+   
+   
+   
+   
+   
+   
 
 const levelSelect=document.getElementById('levelSelect');
 const chapterSelect=document.getElementById('chapterSelect');
