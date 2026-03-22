@@ -196,6 +196,37 @@ select option:nth-child(even){background-color:#e8f4ff;}
 select option:nth-child(odd){background-color:#fff;}
 .hidden{display:none;}
 .inline-topic{display:flex;align-items:center;gap:4px;margin-left:auto;font-size:12px;}
+
+
+
+
+
+
+
+
+
+
+.register-btn{
+  display:inline-block;
+  padding:10px 16px;
+  background:linear-gradient(135deg, #ff9800, #f57c00);
+  color:white;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:bold;
+  text-decoration:none;
+  box-shadow:0 4px 8px rgba(0,0,0,0.2);
+  transition:0.3s;
+}
+
+.register-btn:hover{
+  background:linear-gradient(135deg, #ffa726, #ef6c00);
+  transform:translateY(-2px);
+  box-shadow:0 6px 12px rgba(0,0,0,0.3);
+}
+
+
+
 </style>
 </head>
 
@@ -214,7 +245,25 @@ select option:nth-child(odd){background-color:#fff;}
       <li>Use the latest browser for the best experience.</li>
     </ul>
   </div>
+  
+  
   <input type="email" id="emailInput" placeholder="Enter your email" required />
+  
+  
+  
+  
+  
+  
+  
+  <p id="loginError" style="color:red; font-size:13px; margin-top:5px;"></p>
+  
+  
+  
+  
+  
+  
+  
+  
   <button onclick="login()">Login</button>
   <div id="aboutBox">
     <strong>About G10 Educational Platform:</strong><br>
@@ -249,12 +298,41 @@ select option:nth-child(odd){background-color:#fff;}
 <script>
 const BACKEND_URL="https://practice-test-backend-iit-jee-chemistry-hp48.onrender.com";
 
+
 /* === LOGIN LOGIC === */
 async function login(){
  const email=document.getElementById("emailInput").value.trim().toLowerCase();
- if(!email||!email.includes("@")){
-  alert("Your E.Mail ID is not Registered. For registration call +91 9706380857.");return;
- }
+ if(!email || !email.includes("@")){
+ document.getElementById("loginError").innerHTML = `
+  Your E-Mail ID is not registered.<br><br>
+  <a href="https://gten-educational-platform.github.io/Class-12/email.html" target="_blank" class="register-btn">
+    Register Now
+  </a>
+`;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  return;
+} else {
+  document.getElementById("loginError").innerHTML = "";
+}
  const res=await fetch(`${BACKEND_URL}/login`,{
   method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})
  });
@@ -266,6 +344,14 @@ async function login(){
   document.getElementById("appContainer").style.display="block";
  } else alert("Login failed. Try again.");
 }
+
+
+
+
+
+
+
+
 
 /* === SESSION VALIDATION === */
 window.onload=async function(){
