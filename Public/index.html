@@ -239,15 +239,149 @@ select option:nth-child(odd){background-color:#fff;}
 
 
 
+.luxury-expiry-modal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.65);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:99999;
+  animation:fadeIn 0.4s ease;
+}
 
+.luxury-expiry-box{
+  width:360px;
+  max-width:92%;
+  background:linear-gradient(160deg,#ffffff,#e0f2f1);
+  border-radius:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.4);
+  text-align:center;
+  padding:28px 22px;
+  animation:popupScale 0.4s ease;
+}
+
+.luxury-warning-ring{
+  width:70px;
+  height:70px;
+  margin:auto;
+  border-radius:50%;
+  background:linear-gradient(135deg,#ffebee,#ffcdd2);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  box-shadow:0 0 18px rgba(198,40,40,0.35);
+}
+
+.luxury-warning-icon{
+  font-size:38px;
+  color:#c62828;
+  font-weight:bold;
+}
+
+.luxury-expiry-box h2{
+  margin:14px 0 10px;
+  color:#b71c1c;
+  font-size:23px;
+}
+
+.luxury-expiry-box p{
+  font-size:14px;
+  color:#333;
+  margin:15px 0 22px;
+  line-height:1.6;
+}
+
+.luxury-expiry-buttons{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.luxury-renew-btn{
+  text-decoration:none;
+  background:linear-gradient(135deg,#ff9800,#f57c00);
+  color:white;
+  padding:11px 18px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:bold;
+  box-shadow:0 4px 10px rgba(0,0,0,0.25);
+}
+
+.luxury-later-btn{
+  background:linear-gradient(135deg,#009688,#00796B);
+  color:white;
+  border:none;
+  padding:11px 18px;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:13px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.25);
+}
+
+@keyframes fadeIn{
+ from{opacity:0;}
+ to{opacity:1;}
+}
+
+@keyframes popupScale{
+ from{transform:scale(0.7);}
+ to{transform:scale(1);}
+}
 
 
 
 
 </style>
-</head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <body>
+<div id="luxuryModal" class="luxury-expiry-modal">
+  <div class="luxury-expiry-box">
+
+    <div class="luxury-warning-ring">
+      <div class="luxury-warning-icon">⚠</div>
+    </div>
+
+    <h2>Membership Expiry Alert</h2>
+
+    <p id="expiryText">
+      Your access will expire soon.
+    </p>
+
+    <div class="luxury-expiry-buttons">
+      <a href="https://gten-educational-platform.github.io/Class-12/email.html" target="_blank" class="luxury-renew-btn">
+        Renew Access
+      </a>
+
+      <button onclick="closeExpiryModal()" class="luxury-later-btn">
+        Later
+      </button>
+    </div>
+
+  </div>
+</div>
+	
+
+	
 <div id="loginContainer">
   <img src="https://i.ibb.co/WNZTWPwv/LOGO-PNG-2025-fab.png" alt="G10 Educational Platform Logo" />
   
@@ -329,61 +463,143 @@ const BACKEND_URL="https://practice-test-backend-iit-jee-chemistry-hp48.onrender
 
 
 
+function getFingerprint(){
+  return btoa(
+    navigator.userAgent +
+    screen.width +
+    screen.height +
+    navigator.language +
+    Intl.DateTimeFormat().resolvedOptions().timeZone
+  );
+}
+
+
+
+
+
+
+
+function showExpiryPopup(expiryDateString){
+  const d = new Date(expiryDateString);
+
+  const formattedDate =
+    String(d.getDate()).padStart(2,'0') + "/" +
+    String(d.getMonth()+1).padStart(2,'0') + "/" +
+    d.getFullYear();
+
+  setTimeout(() => {
+    showExpiryModal(formattedDate);
+  }, 800);
+}
+
+
+
+
+
+
+
+
 
 
 /* === LOGIN LOGIC === */
-async function login(){
- const email=document.getElementById("emailInput").value.trim().toLowerCase();
- const errorBox = document.getElementById("loginError");
+async function login() {
+  const email = document.getElementById("emailInput").value.trim().toLowerCase();
+  const errorBox = document.getElementById("loginError");
 
- // ❗ Step 1: Format validation
- if(!email || !email.includes("@")){
-  errorBox.innerHTML = `
-    Your E-Mail ID is not registered.<br><br>
-    <a href="https://gten-educational-platform.github.io/Class-12/email.html" target="_blank" class="register-btn">
-      Register Now
-    </a>
-  `;
-  return;
- } else {
-  errorBox.innerHTML = "";
- }
-
- try {
-   const res=await fetch(`${BACKEND_URL}/login`,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({email})
-   });
-
-   const data=await res.json();
-
-   // ❗ Step 2: Backend validation
-   if(data.token){
-    localStorage.setItem("studentEmail",email);
-    localStorage.setItem("sessionToken",data.token);
-    document.getElementById("loginContainer").style.display="none";
-    document.getElementById("appContainer").style.display="block";
-   } else {
+  if (!email || !email.includes("@")) {
     errorBox.innerHTML = `
-      Your E-Mail ID is not registered.<br><br>
-      <a href="https://gten-educational-platform.github.io/Class-12/email.html"
-   target="_blank"
-   class="register-btn"
-   onclick="this.style.display='none'">
-  Register Now
-</a>
+      Your E-mail ID not found. Click ‘Register’ to generate your login access code (looks like an e-mail).<br><br>
+      <a href="https://gten-educational-platform.github.io/Class-12/email.html" target="_blank" class="register-btn">
+        Register Now
+      </a>
     `;
-   }
+    return;
+  }
 
- } catch (err) {
-   errorBox.innerText = "Server error. Try later.";
- }
+  try {
+    const res = await fetch(`${BACKEND_URL}/login`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        email,
+        fingerprint:getFingerprint()
+      })
+    });
+
+    const data = await res.json();
+
+
+    // DEVICE HARD BLOCKED
+    if(data.blocked){
+      errorBox.innerHTML = `
+        This device has been restricted due to unauthorized attempts.<br><br>
+        However, you can still register to get valid access.<br><br>
+        <a href="https://gten-educational-platform.github.io/Class-12/email.html" target="_blank" class="register-btn">
+          Register Now
+        </a>
+      `;
+      return;
+    }
+
+    // FAKE USER TRAP LOGIN
+    if(data.trap){
+      localStorage.setItem("studentEmail", email);
+      localStorage.setItem("sessionToken", data.token);
+
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("appContainer").style.display = "block";
+      
+
+      showUnauthorizedTrapPopup();
+      return;
+    }
+
+    // EXPIRED GENUINE USER
+    if(data.expired){
+      errorBox.innerHTML = `
+        Your access has expired.<br>
+        Please register again to renew access.<br><br>
+        <a href="https://gten-educational-platform.github.io/Class-12/email.html" target="_blank" class="register-btn">
+          Renew Access
+        </a>
+      `;
+      return;
+    }
+
+    // GENUINE VALID LOGIN
+    if(data.token){
+      localStorage.setItem("studentEmail", email);
+      localStorage.setItem("sessionToken", data.token);
+
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("appContainer").style.display = "block";
+     
+
+      if(data.expiringSoon){
+        showExpiryPopup(data.expiryDate);
+      }
+
+      return;
+    }
+
+
+    // NOT REGISTERED
+    errorBox.innerHTML = `
+      Your E-mail ID not found. Click ‘Register’ to generate your login access code (looks like an e-mail).<br><br>
+      <a href="https://gten-educational-platform.github.io/Class-12/email.html" target="_blank" class="register-btn">
+        Register Now
+      </a>
+    `;
+
+  } catch (err) {
+    console.log(err);
+    errorBox.innerText = "Server error. Try later.";
+  }
 }
 
+
 document.getElementById("emailInput").addEventListener("input", function() {
-  const errorBox = document.getElementById("loginError");
-  errorBox.innerHTML = ""; // 🔥 clears error + hides Register button
+  document.getElementById("loginError").innerHTML = "";
 });
 
 
@@ -404,36 +620,129 @@ document.getElementById("emailInput").addEventListener("input", function() {
 
 
 
-/* === SESSION VALIDATION === */
-window.onload=async function(){
- const savedEmail=localStorage.getItem("studentEmail");
- const token=localStorage.getItem("sessionToken");
- if(!savedEmail||!token)return;
- const res=await fetch(`${BACKEND_URL}/validate`,{
-  method:"POST",headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({email:savedEmail,token})
- });
- const data=await res.json();
- if(data.valid){
-  document.getElementById("loginContainer").style.display="none";
-  document.getElementById("appContainer").style.display="block";
- } else localStorage.clear();
+
+/* === Change for 365 SESSION VALIDATION === */
+window.onload = async function() {
+  const email = localStorage.getItem("studentEmail");
+  const token = localStorage.getItem("sessionToken");
+
+  if((email && !token) || (!email && token)){
+    localStorage.clear();
+    location.reload();
+    return;
+  }
+
+  if (!email || !token) return;
+
+  const res = await fetch(`${BACKEND_URL}/validate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+	
+		
+	
+    body: JSON.stringify({
+ email,
+ token,
+ fingerprint:getFingerprint()
+})
+	
+
+  });
+
+  const data = await res.json();
+
+  if (data.expired) {
+    alert("Your access has expired. Please renew.");
+    localStorage.clear();
+    return;
+  }
+  
+  
+ if(data.trap){
+  document.getElementById("loginContainer").style.display = "none";
+  document.getElementById("appContainer").style.display = "block";
+  
+
+  showUnauthorizedTrapPopup();
+  return;
+}
+  
+
+  if (data.valid) {
+    document.getElementById("loginContainer").style.display = "none";
+    document.getElementById("appContainer").style.display = "block";
+    
+
+    if (data.expiringSoon) {
+      showExpiryPopup(data.expiryDate);
+    }
+
+  } else {
+    localStorage.clear();
+  }
 };
 
-/* === AUTO LOGOUT === */
-setInterval(async()=>{
- const email=localStorage.getItem("studentEmail");
- const token=localStorage.getItem("sessionToken");
- if(!email||!token)return;
- const res=await fetch(`${BACKEND_URL}/validate`,{
-  method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,token})
- });
- const data=await res.json();
- if(!data.valid){
-  alert("⚠️ You have been logged out because this account was opened on another device.");
-  localStorage.clear();location.reload();
- }
-},5000);
+
+
+
+
+
+
+
+// change this for Block complete auto logout if another device logs in
+setInterval(async () => {
+  const email = localStorage.getItem("studentEmail");
+  const token = localStorage.getItem("sessionToken");
+
+  if (!email || !token) return;
+
+  const res = await fetch(`${BACKEND_URL}/validate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email,
+      token,
+      fingerprint:getFingerprint()
+    })
+  });
+
+  const data = await res.json();
+
+  if(data.trapExpired){
+    alert("Unauthorized access session expired.");
+    localStorage.clear();
+    location.reload();
+    return;
+  }
+
+  if (data.expired) {
+    alert("Your access has expired. Please renew.");
+    localStorage.clear();
+    location.reload();
+    return;
+  }
+
+  if (!data.valid) {
+    alert("⚠️ You have been logged out because this account was opened on another device.");
+    localStorage.clear();
+    location.reload();
+  }
+}, 5000);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1197,6 +1506,32 @@ if(window.innerWidth<=600){
    bar.scrollBy({left:50*direction,behavior:"smooth"});
   }
  },3000);
+}
+
+
+function showExpiryModal(formattedDate){
+  document.getElementById("expiryText").innerHTML =
+    `Your membership access will expire on <b>${formattedDate}</b>.<br><br>
+     Please renew now to continue uninterrupted premium practice tests.`;
+
+  document.getElementById("luxuryModal").style.display = "flex";
+}
+
+function closeExpiryModal(){
+  document.getElementById("luxuryModal").style.display = "none";
+}
+
+
+
+
+
+function showUnauthorizedTrapPopup(){
+  document.getElementById("expiryText").innerHTML =
+  `Unauthorized verification session activated.<br>
+   Limited preview access granted temporarily.<br><br>
+   This session will close automatically in 5 minutes.`;
+
+  document.getElementById("luxuryModal").style.display = "flex";
 }
 </script>
 </html>
